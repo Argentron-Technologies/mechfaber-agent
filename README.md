@@ -49,7 +49,7 @@ the server:
 |---|---|---|
 | **Codex** | `~/.agents/skills/` | `~/.codex/config.toml` |
 | **OpenCode** | `~/.agents/skills/` or `~/.claude/skills/` | `opencode.json` |
-| **Crush** | `~/.config/crush/skills/` <br>(`%LOCALAPPDATA%\crush\skills\` on Windows) | `crush.json` |
+| **Crush** | `~/.agents/skills/` | `crush.json` |
 
 <details>
 <summary>Server config for each</summary>
@@ -86,10 +86,19 @@ url = "https://api.mechfaber.com/mcp"
 ```
 </details>
 
-`~/.agents/skills/` is the nearest thing to a universal location — Codex and
-OpenCode both read it, and Crush reads `~/.config/agents/skills/`. Claude Code
-and OpenCode also read `~/.claude/skills/`. **Crush does not read
-`.claude/skills`**, so it needs its own folder.
+**`~/.agents/skills/` works for all three** — Codex, OpenCode and Crush each
+read it, so one copy is enough.
+
+Each also reads its own locations if you prefer them. Crush is the most
+accommodating — `$CRUSH_SKILLS_DIR`, `~/.config/agents/skills/`,
+`~/.config/crush/skills/`, `~/.agents/skills/`, `~/.claude/skills/`, the
+`%LOCALAPPDATA%\agents\skills\` and `%LOCALAPPDATA%\crush\skills\`
+equivalents on Windows, and anything in `options.skills_paths`.
+
+They also load **project-local** skills — Crush from `.agents/skills`,
+`.crush/skills`, `.claude/skills` and `.cursor/skills`. Committing the skill
+folder to a repository therefore gives everyone working in it the same design
+loop, without anyone installing anything.
 
 ### Signing in
 
