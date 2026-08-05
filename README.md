@@ -11,6 +11,10 @@ cites its sources.
 
 ## Install
 
+> **You need a MechFaber account** — sign up at
+> [app.mechfaber.com](https://app.mechfaber.com). Installing the plugin does
+> not create one, and the first tool call will stop at the server without it.
+
 ### Claude Code
 
 From your shell:
@@ -102,9 +106,19 @@ loop, without anyone installing anything.
 
 ### Signing in
 
-You need a MechFaber account. The server speaks OAuth, so your agent opens a
-browser on first use — **there is no API key to paste, and nothing secret in
-this repository.**
+**Create an account first** at
+[app.mechfaber.com](https://app.mechfaber.com) — the plugin installs without
+one, but the first tool call will not get past the server.
+
+Then, the first time your agent uses MechFaber, it opens a browser:
+
+1. Sign in, if you are not already.
+2. A consent screen names your agent and lists what it is asking for.
+   **Approve it** and the browser hands a token back automatically.
+
+That is the whole setup — **no API key to paste, and nothing secret in this
+repository.** Access is yours, granted per agent, and revocable from your
+account settings.
 
 Self-hosting or working locally? Point it elsewhere:
 
@@ -158,6 +172,13 @@ plugins/mechfaber/
 - [mechfaber.com](https://mechfaber.com) — what it is
 - [app.mechfaber.com](https://app.mechfaber.com) — the Studio: viewer,
   simulation, wiring, bill of materials
+- [argentrontech.com](https://argentrontech.com) — Argentron Technologies,
+  who build it
+
+---
+
+<sub>MechFaber is built by
+[Argentron Technologies](https://argentrontech.com).</sub>
 
 ## Licence
 

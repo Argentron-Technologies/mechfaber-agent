@@ -3,7 +3,8 @@
   "name": "mechfaber",
   "description": "The MechFaber machine-design engine for Claude Code.",
   "owner": {
-    "name": "MechFaber"
+    "name": "Argentron Technologies",
+    "url": "https://argentrontech.com"
   },
   "plugins": [
     {
@@ -11,7 +12,8 @@
       "displayName": "MechFaber",
       "description": "Design real machines: you own the topology and the geometry, deterministic solvers own every number. Real CAD, real physics, real parts with cited datasheets.",
       "author": {
-        "name": "MechFaber"
+        "name": "Argentron Technologies",
+        "url": "https://argentrontech.com"
       },
       "category": "development",
       "version": "0.1.0",
