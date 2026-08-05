@@ -175,10 +175,6 @@ plugins/mechfaber/
 - [argentrontech.com](https://argentrontech.com) — Argentron Technologies,
   who build it
 
----
-
-<sub>MechFaber is built by
-[Argentron Technologies](https://argentrontech.com).</sub>
 
 ## Licence
 
@@ -190,3 +186,8 @@ LGPL-3.0 is defined as GPL-3.0 plus a set of additional permissions.
 [`COPYING.LESSER`](COPYING.LESSER) carries the permissions; the GPL they
 build on is at [gnu.org/licenses/gpl-3.0.txt](https://www.gnu.org/licenses/gpl-3.0.txt)
 rather than copied in here.
+
+---
+
+<sub>MechFaber is built by
+[Argentron Technologies](https://argentrontech.com).</sub>
