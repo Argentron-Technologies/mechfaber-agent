@@ -143,9 +143,7 @@ plugins/mechfaber/
 proprietary project and that project stays yours, but changes to the skill
 itself stay open.
 
-LGPL-3.0 is defined as GPL-3.0 plus a set of additional permissions, so both
-texts ship: [`COPYING.LESSER`](COPYING.LESSER) is the LGPL supplement that
-governs this work, and the GPL it builds on is at
-[`licenses/GPL-3.0.txt`](licenses/GPL-3.0.txt). The GPL text lives outside
-the repository root deliberately — kept beside it, GitHub reported the
-project as carrying two licences.
+LGPL-3.0 is defined as GPL-3.0 plus a set of additional permissions.
+[`COPYING.LESSER`](COPYING.LESSER) carries the permissions; the GPL they
+build on is at [gnu.org/licenses/gpl-3.0.txt](https://www.gnu.org/licenses/gpl-3.0.txt)
+rather than copied in here.
