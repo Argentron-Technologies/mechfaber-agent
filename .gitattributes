@@ -1,0 +1,4 @@
+# Licence texts are matched against canonical copies by hash; a CRLF
+# rewrite makes them stop matching and the licence stops being reported.
+COPYING         text eol=lf
+COPYING.LESSER  text eol=lf

@@ -1,0 +1,29 @@
+{
+  "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
+  "name": "mechfaber",
+  "description": "The MechFaber machine-design engine for Claude Code.",
+  "owner": {
+    "name": "MechFaber"
+  },
+  "plugins": [
+    {
+      "name": "mechfaber",
+      "displayName": "MechFaber",
+      "description": "Design real machines: you own the topology and the geometry, deterministic solvers own every number. Real CAD, real physics, real parts with cited datasheets.",
+      "author": {
+        "name": "MechFaber"
+      },
+      "category": "development",
+      "version": "0.1.0",
+      "source": "./plugins/mechfaber",
+      "homepage": "https://mechfaber.com",
+      "keywords": [
+        "cad",
+        "robotics",
+        "mechanical-design",
+        "simulation"
+      ],
+      "license": "LGPL-3.0"
+    }
+  ]
+}

@@ -1,0 +1,4 @@
+# nothing built here, but keep the usual noise out
+.DS_Store
+Thumbs.db
+node_modules/

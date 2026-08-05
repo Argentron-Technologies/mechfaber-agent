@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "mechfaber": {
+      "type": "http",
+      "url": "${MECHFABER_MCP_URL:-https://api.mechfaber.com/mcp}"
+    }
+  }
+}
