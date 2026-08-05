@@ -83,11 +83,15 @@ url = "https://api.mechfaber.com/mcp"
   "mcp": {
     "mechfaber": {
       "type": "http",
-      "url": "https://api.mechfaber.com/mcp"
+      "url": "https://api.mechfaber.com/mcp",
+      "oauth": true
     }
   }
 }
 ```
+
+`"oauth": true` is required. Crush does not infer it, and without the flag
+every call goes out unauthenticated and the browser sign-in never happens.
 </details>
 
 **`~/.agents/skills/` works for all three** — Codex, OpenCode and Crush each
@@ -104,6 +108,18 @@ They also load **project-local** skills — Crush from `.agents/skills`,
 folder to a repository therefore gives everyone working in it the same design
 loop, without anyone installing anything.
 
+### Which model
+
+MechFaber supplies the engine, not the model — the gates hold whichever one
+designs. But **the geometry is the agent's own work**, and that is where
+models differ most: laying out a machine in three dimensions, keeping a joint
+frame straight, and noticing that a beam now passes through an actuator.
+
+Use a frontier model for design work — **Claude Fable**, **Claude Opus 5** or
+**OpenAI GPT-5.6 Sol**. Smaller models can still drive the tools and read the
+verdicts, but they tend to produce shapes the gates then reject, and the loop
+gets long.
+
 ### Signing in
 
 **Create an account first** at
@@ -119,12 +135,6 @@ Then, the first time your agent uses MechFaber, it opens a browser:
 That is the whole setup — **no API key to paste, and nothing secret in this
 repository.** Access is yours, granted per agent, and revocable from your
 account settings.
-
-Self-hosting or working locally? Point it elsewhere:
-
-```
-export MECHFABER_MCP_URL=https://localhost:44301/mcp
-```
 
 ---
 
