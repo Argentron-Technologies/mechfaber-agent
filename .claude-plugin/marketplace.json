@@ -16,7 +16,7 @@
         "url": "https://argentrontech.com"
       },
       "category": "development",
-      "version": "0.1.1",
+      "version": "0.1.2",
       "source": "./plugins/mechfaber",
       "homepage": "https://mechfaber.com",
       "keywords": [

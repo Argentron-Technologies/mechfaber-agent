@@ -18,11 +18,12 @@ idea what kinds of machine exist. You do.
 
 ## The loop
 
-**1. Numbers are not yours to choose.** `mech_solve_layout` returns packing
-numbers. `mech_joint_duty`, `mech_simulate` and `mech_link_stress` judge any
-dimension you give them.
+**1. Numbers are not yours to choose.** `mech_joint_duty`, `mech_simulate`,
+`mech_link_stress` and `mech_power_budget` judge any dimension you give them.
 
-Nothing here returns a link length. If a proportion has to be assumed to get
+Nothing here PROPOSES a dimension - there is no layout solver, and a link
+length, a plate thickness or a bolt circle is yours to pick and theirs to
+refuse. If a proportion has to be assumed to get
 started, **state it as an assumption in your answer and gate it immediately**
 - an assumed number that passes a gate is evidence; one that never reaches a
 gate is a guess wearing a result.
@@ -30,16 +31,32 @@ gate is a guess wearing a result.
 An INFEASIBLE result names the violated constraint - change the spec, never
 the number.
 
-**2. Get the actuator's real numbers - from the sourcing tools, not the
-open web.** `mech_part_search` asks every catalogue at once: this
+**2. Get every sourced component's real numbers - from the sourcing tools,
+not the open web.** That means the actuators AND the electronics. A machine
+sources its whole bill: motors and gearmotors, but also the MCU, the
+regulators/BECs, the battery pack, and any driver or ESC between them -
+every number the wiring layout and the firmware run will later demand
+(`min_voltage_v`, `output_a`, `capacity_wh`, Kt, winding R) is a sourcing
+number exactly like rated torque, and typing one from memory is the same
+mistake at a different voltage. Source them in the same pass you source the
+actuators, while the shortlist is in front of you - not at step 5, where a
+missing rating turns into a guess because the loom is half-drawn.
+
+`mech_part_search` asks every catalogue at once: this
 installation's own measured library, the step.parts mirror (16k+ parts with
-STEP files), Mouser and EasyEDA for the electronics. Read `trust` on each
+STEP files), Mouser and EasyEDA - the latter two are WHERE THE ELECTRONICS
+ARE, so a search that only ever names motors is using half the index. Ask it
+for the MCU board and the regulator like you ask it for the shoulder module.
+Read `trust` on each
 hit - `measured` numbers were transcribed here from a cited page with the
 evidence kept; `stated` numbers are the vendor's claim. Hits that lack
 ratings go through `mech_part_measure` - pass the WHOLE SHORTLIST as
 `part_ids` in one call: pages come from the catalogue records and the parts
 are measured concurrently, so six candidates cost roughly the slowest one,
-not six turns. Every record lands in the library with its citation, so the
+not six turns. **Keep a batch to about six.** Each part is a page fetch and
+a model read; past that the call runs longer than the 120 s tool window and
+is handed to the background, where you have to come back for it - which
+costs the turns the batch was meant to save. Shortlist first, then measure. Every record lands in the library with its citation, so the
 next design starts richer than this one did. `mech_part_cad` fetches the hit's STEP into your
 project and measures it on the way in.
 
@@ -303,9 +320,17 @@ loom and SAVE it with `mech_wiring(action="save", layout=...)`:
 
 - components: the pack (`battery`, with `voltage_v`, `capacity_wh`), each
   regulator/BEC (`output_v`, `output_a`), the `mcu` (`min_voltage_v` - the
-  brownout threshold from ITS datasheet), one `motor` per actuated joint
+  brownout threshold), one `motor` per actuated joint
   **whose id IS the joint name** - that is how the firmware simulation maps
   wire drops onto actuators.
+- every one of those component ratings should trace to a record you sourced
+  at step 2 - the MCU, the regulator and the pack through
+  `mech_part_search` / `mech_part_measure` with the citation kept, the same
+  loop the actuators went through. A brownout threshold from a cited record
+  is a measurement; one recalled while wiring is the number that browns out
+  on the bench. If the electronics were not sourced at step 2, source them
+  NOW, before the layout is saved - the layout is where their numbers become
+  load-bearing.
 - nets: power runs with `awg` and `length_mm` MEASURED off your own
   geometry (the joint positions are in the graph - a run to the wrist is
   the sum of the link lengths it travels, not a guess), signal runs with
@@ -372,11 +397,28 @@ at the machine.
 
 ## Projects
 
-`mech_project(action=...)` with create / open / rename / list / current /
-delete. A project belongs to you and lives at `<workspaces>/<userId>/<id>/`,
-so a rename moves nothing and two projects may share a name. Pass an id when
-you mean a specific one. Every build reports `project` and `wrote_to`, and a
-build that seems to have produced nothing is almost always in another one.
+`mech_project(action=...)` with create / describe / open / rename / list /
+current / delete. A project belongs to you, so a rename moves nothing and two
+projects may share a name. Pass an id when you mean a specific one. Every
+build reports `project`, and a build that seems to have produced nothing is
+almost always in another one.
+
+**Say what the machine is when you create it.** `create` takes `title` and
+`summary` as well as `name`:
+
+```
+mech_project(action="create", name="cobot-arm-5kg",
+             title="5 kg-payload 6-DoF cobot arm",
+             summary="620 mm reach on CubeMars AK-series modules, 24 V, "
+                     "sized on rated torque at full extension.")
+```
+
+`name` is a label - a folder someone has to pick out of a list. The other two
+are what the machine IS, and they become the headline and the description if
+it is ever published, so `mech_library(action="publish")` then needs nothing
+but the project. Written at the end instead, they are written by whoever is
+left after the design is finished. Use `action="describe"` to revise either
+one when the machine turns into something else.
 
 ## Spend turns like they cost a minute each, because they do
 

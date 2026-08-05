@@ -3,7 +3,7 @@
   "name": "mechfaber",
   "displayName": "MechFaber",
   "description": "Design real machines: the agent owns the topology and the geometry, deterministic solvers own every number. Real CAD (build123d/OCCT), real physics (MuJoCo), real firmware (Renode), and parts with cited datasheets.",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "author": {
     "name": "Argentron Technologies",
     "url": "https://argentrontech.com"
