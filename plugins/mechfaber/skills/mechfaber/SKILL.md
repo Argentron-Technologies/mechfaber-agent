@@ -359,6 +359,17 @@ limit), `electrical.ticks_skipped_mcu_dark` (your controller was off), and
 `speed_factor`. A machine that passes statics and sim but browns out on its
 first coordinated move fails HERE, and this is the only gate that sees it.
 
+## End with the link
+
+Every build and every `mech_project` call returns `url` - the address of this
+machine in the Studio, where the person you are working for can turn it,
+simulate it, read its loom and its bill of materials.
+
+**Finish the session with it.** Volumes, safety factors and gate verdicts are
+the evidence; they are not something anyone can show a colleague. A design
+that ends with numbers in a transcript and no link ends with nobody looking
+at the machine.
+
 ## Projects
 
 `mech_project(action=...)` with create / open / rename / list / current /
