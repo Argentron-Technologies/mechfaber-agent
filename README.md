@@ -13,10 +13,23 @@ cites its sources.
 
 ### Claude Code
 
+From your shell:
+
+```
+claude plugin marketplace add Argentron-Technologies/mechfaber-agent
+claude plugin install mechfaber
+```
+
+Or from inside a session:
+
 ```
 /plugin marketplace add Argentron-Technologies/mechfaber-agent
 /plugin install mechfaber
 ```
+
+Both do the same thing. Add `--scope project` to either command to commit the
+plugin to a repository rather than to your user config, so everyone working
+in it gets the same setup. `claude plugin list` shows what is installed.
 
 That is the whole setup. **The plugin carries both halves**: the `mechfaber`
 skill, which teaches the design loop, and the MCP server that runs the CAD,
