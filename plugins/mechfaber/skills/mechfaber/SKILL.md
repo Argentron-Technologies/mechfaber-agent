@@ -16,6 +16,49 @@ the parts. Nothing in this engine will draw them for you and nothing should
 - a solver that picks a shape is a solver guessing, and the engine has no
 idea what kinds of machine exist. You do.
 
+## What runs in parallel, and what cannot
+
+A design session is slow because of how many exchanges it takes. So the
+question at every step is not "how long does this compute" - almost nothing
+here computes for long - but "does this have to wait for the thing before
+it".
+
+**Fan out over independent items.** Sourcing is N candidates that know
+nothing about each other; STEP inspection is N files that know nothing about
+each other. Both are context-heavy in and small out, which is exactly what a
+subagent is for. Two are shipped with this plugin:
+
+- **`part-reader`** - one candidate's datasheet, read and stored. One per
+  candidate.
+- **`step-inspector`** - one vendor STEP, downloaded and measured into bolt
+  circles and an envelope. One per sourced module.
+
+**Start sourcing BEFORE you need it.** It is the long pole and nothing about
+it depends on your geometry. Dispatch the whole bill - actuators AND
+electronics - the moment you know roughly what the machine is, then do step 1
+against assumed proportions while they read. Their answers land before you
+need the actuator masses to close the duty loop. Sourcing at step 2 in
+sequence, then drawing, is a serial chain that had no reason to be one.
+
+**Batch independent tool calls into one turn.** Not everything needs an
+agent. `mech_joint_duty` and `mech_simulate` take the same graph and do not
+depend on each other - issue both in one turn, and `mech_link_stress` after,
+because it takes duty's output. Same for a pose sweep: each pose is its own
+independent call. A turn spent asking one question that could have carried
+four is a minute.
+
+**Do NOT fan out the geometry.** The parts have to mate: shared datums, a
+bolt circle one part cuts and another matches, a joint frame both sides
+agree on. Two agents drawing an upper arm and a forearm in isolation produce
+two parts that do not connect, and you will not find out until the build.
+The topology, the proportions and every solid are yours, in one head, in one
+script. This is the same reason nothing in this engine draws for you.
+
+**Do not fan out a feedback loop.** Draw, gate, read the verdict, repair -
+each step needs the one before it. Spawning an agent to "review the build
+result" adds a round trip to read a structured result that is already on
+your screen.
+
 ## The loop
 
 **1. Numbers are not yours to choose.** `mech_joint_duty`, `mech_simulate`,
@@ -49,20 +92,65 @@ ARE, so a search that only ever names motors is using half the index. Ask it
 for the MCU board and the regulator like you ask it for the shoulder module.
 Read `trust` on each
 hit - `measured` numbers were transcribed here from a cited page with the
-evidence kept; `stated` numbers are the vendor's claim. Hits that lack
-ratings go through `mech_part_measure` - pass the WHOLE SHORTLIST as
-`part_ids` in one call: pages come from the catalogue records and the parts
-are measured concurrently, so six candidates cost roughly the slowest one,
-not six turns. **Keep a batch to about six.** Each part is a page fetch and
-a model read; past that the call runs longer than the 120 s tool window and
-is handed to the background, where you have to come back for it - which
-costs the turns the batch was meant to save. Shortlist first, then measure. Every record lands in the library with its citation, so the
-next design starts richer than this one did. `mech_part_cad` fetches the hit's STEP into your
-project and measures it on the way in.
+evidence kept; `stated` numbers are the vendor's claim. Shortlist first,
+then measure. Every record lands in the library with its citation, so the
+next design starts richer than this one did. `mech_part_cad` fetches the
+hit's STEP into your project and measures it on the way in.
+
+### Reading candidates: one `part-reader` per part, all at once
+
+**YOU are the reader now.** The engine does not run a model over vendor
+pages any more - it fetches the documentation and hands the text back. That
+made reading fast and free; what makes it FAST IN WALL CLOCK is doing all of
+it at once.
+
+**Dispatch one `part-reader` subagent per candidate, in a single turn** -
+the actuator shortlist and the MCU and the regulator and the pack, together.
+Each one calls `mech_part_docs`, reads its own document, calls
+`mech_part_measure` itself, and reports one line:
+
+> `robstride_03 - selectable:true | rated 2.4 A / peak 11 A / 0.92 N.m | envelope [46,46,47]`
+
+Six candidates then cost roughly the slowest one, and six datasheets - tens
+of thousands of characters each - never enter your context. Read serially in
+your own window instead, that is most of an hour and most of a context spent
+on pages you are about to reject.
+
+The two tools, when you do need them directly (a single part, or a page a
+subagent could not resolve):
+
+- `mech_part_docs(part_id)` - the product page and its datasheet PDF as
+  text, the field names this engine calculates with, and the record it
+  already holds, if any.
+- `mech_part_measure(part_id, specs=[...])` - what you read, stored.
+
+Each spec is `{field, value, unit, evidence}`. Copy the value and unit
+**exactly as printed** - `9.4` and `kgf.cm`, never `0.92` and `N.m`. The
+engine converts; a number you converted yourself is a number nobody can
+check. The `evidence` span is copied **verbatim** and is matched character by
+character against the page the engine re-fetches, so a tidied or paraphrased
+quote is discarded and that rating is lost.
+
+**A subagent transcribes and reports. It does not choose the part.** You
+hold the joint torques, the mass budget and the envelope; the choice and
+the `why` you write into `mech_actuators` are yours, made when you make
+them - not reconstructed afterwards from a subagent's recommendation.
+
+If a reader comes back "already measured, selectable, same page", that part
+cost nothing and there is nothing to submit.
+
+### Then the STEPs: one `step-inspector` per chosen module
+
+Once the modules are chosen, fan out again - one `step-inspector` per part.
+Each downloads the vendor STEP into the project and hands back the mating
+interface (bolt circles with their diameter, count, centre and axis; the
+shaft; the envelope, and whether it agrees with the datasheet) instead of a
+feature dump you have to read. Those few numbers are what your build script
+mates to.
 
 Reach for a general web search ONLY when every source has answered and none
-carries the part - and then feed what you find THROUGH mech_part_measure
-rather than typing numbers into the design, because a rating with no
+carries the part - and then feed what you find THROUGH `mech_part_docs` and
+`mech_part_measure` rather than typing numbers into the design, because a rating with no
 citation is a number somebody typed, and it will be the one that is wrong.
 Put the URL in your answer beside each number either way.
 
@@ -77,6 +165,13 @@ assembly or in the wrong units. `mech_inspect_cad` measures it for you.
 **3. Draw it.** `mech_build` runs the build123d you write and reports
 volume, bbox, mass, centre and solid count. It never edits your design.
 Iterate here until the part is right.
+
+**Name AND title every part.** `show(part, "upper_arm", title="Upper arm
+shell")` - the snake_case name is the graph identity joints and gates refer
+to; the title is what a person reads on the parts list and the BOM. A
+machine whose bill reads `upper_arm, j2_module, gripper_base` was named for
+the solver and nobody else; the title costs six words at the moment you
+know exactly what the part is.
 
 **Then LOOK at it: `mech_look` after every build.** It returns actual
 renders (iso, front, right, top) of the mesh you just built. The mate
@@ -208,8 +303,12 @@ in this viewer or any other. What checks solids is `interference` on the
 build result, and it checks THE ASSEMBLED POSE ONLY. If you pose the machine
 and want to know it still fits, rebuild it in that pose.
 
-**4. Gate it.** Feed that graph to `mech_joint_duty`, then `mech_link_stress`,
-then `mech_simulate`.
+**4. Gate it.** Feed that graph to `mech_joint_duty` and `mech_simulate`
+**in the same turn** - they take the same graph, they do not depend on each
+other, and running them one after the other buys a minute of waiting and
+nothing else. `mech_link_stress` comes after, because it consumes duty's
+output. If several poses matter, all of their duty calls go in that same
+turn too.
 
 `mech_simulate` asks a different question depending on how you say the
 machine is mounted, and you have to say:
@@ -425,6 +524,13 @@ one when the machine turns into something else.
 The arithmetic in here runs in microseconds and a CAD build takes about five
 seconds. Everything else is the round trip. A design session is slow because
 of how many exchanges it takes, not how much it computes.
+
+Which is why the two levers at the top of this skill are the whole game:
+**fan the independent work out** (a `part-reader` per candidate, a
+`step-inspector` per module, dispatched before you need them), and **put
+independent calls in one turn** rather than one after another. Everything
+else below is about not spending a turn asking for something you already
+have.
 
 **`mech_build` already gates what it built.** It returns `interference` (exact
 overlap of every unjointed pair of solids), `duty_self_weight`, and
