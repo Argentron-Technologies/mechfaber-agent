@@ -33,6 +33,11 @@ subagent is for. Two are shipped with this plugin:
 - **`step-inspector`** - one vendor STEP, downloaded and measured into bolt
   circles and an envelope. One per sourced module.
 
+Neither is required. They are a convenience for delegating a big document to
+a context that is not yours; if they are unavailable, the same work is the
+same two tool calls made here, one candidate at a time - keep what you
+extract and drop the page.
+
 **Start sourcing BEFORE you need it.** It is the long pole and nothing about
 it depends on your geometry. Dispatch the whole bill - actuators AND
 electronics - the moment you know roughly what the machine is, then do step 1

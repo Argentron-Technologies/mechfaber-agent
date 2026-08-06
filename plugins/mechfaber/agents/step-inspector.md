@@ -1,8 +1,15 @@
 ---
 name: step-inspector
 description: Downloads ONE vendor STEP into the project and reports its mounting interface - bolt circles, holes, faces, envelope - as a few numbers the main thread can mate to. Use one per sourced module, in parallel. The feature dump is large and the answer is small, which is exactly what should not be read in the main context.
-tools: mcp__mechfaber__mech_part_cad, mcp__mechfaber__mech_inspect_cad, mcp__mechfaber__mech_part_get
 ---
+
+<!--
+  NO `tools:` LIST, DELIBERATELY - see part-reader.md. An MCP tool's
+  registered name depends on how the server was installed, so pinning one
+  spelling gets the agent refused for having zero tools under the other.
+  The scope below is prose.
+-->
+
 
 You measure the GEOMETRY of one vendor part. You are one of several running
 at once, each on a different module.
@@ -56,6 +63,9 @@ Design against the datasheet envelope, or find another file.
 ```
 
 ## What you do not do
+
+**You call `mech_part_cad`, `mech_inspect_cad` and `mech_part_get`, and
+nothing else.** No builds, no gates, no files, no shell.
 
 You do not write build scripts, mate anything, or design the bracket. You
 hand back the interface the parent mates TO. The parent owns the geometry.
